@@ -13,6 +13,7 @@ visible.
 | Image repository | `ghcr.io/glbnxt/my-first-app` |
 | Tag | `1.0.0` (then update to `1.1.0`) |
 | Container port | `8080` |
+| Logo | `https://raw.githubusercontent.com/GLBNXT/my-first-app/main/logo.png` |
 
 ## Settings
 
