@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your first application</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎉%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="confetti.browser.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div id="banner" class="banner" role="status" hidden></div>
+
+  <header class="hero">
+    <p class="eyebrow">My Apps demo</p>
+    <h1>Congratulations, your first application is live!</h1>
+    <p id="greeting" class="greeting"></p>
+    <button id="celebrate" class="button" type="button">Celebrate again</button>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Your application</h2>
+      <dl class="facts">
+        <dt>Name</dt><dd id="application">–</dd>
+        <dt>Organisation</dt><dd id="organisation">–</dd>
+        <dt>Address</dt><dd><a id="address" href="#">–</a></dd>
+        <dt>Version</dt><dd id="version">–</dd>
+        <dt>Running since</dt><dd id="started">–</dd>
+      </dl>
+      <p class="hint">The padlock next to the address in your browser means the connection is secure. The platform takes care of that for you.</p>
+    </section>
+
+    <section class="card">
+      <h2>Your settings</h2>
+      <p>This application reads three settings. You can change them in My Apps, under your application's environment variables.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Setting</th><th>Now</th><th>What it does</th></tr></thead>
+          <tbody id="settings"></tbody>
+        </table>
+      </div>
+      <div class="try">
+        <strong>Try it</strong>
+        <ol>
+          <li>Open this application in My Apps.</li>
+          <li>Add <code>PAGE_COLOR</code> with the value <code>purple</code>, or <code>CONFETTI_STYLE</code> with <code>stars</code>.</li>
+          <li>Save, and keep this page open. It changes by itself when your new settings are live.</li>
+        </ol>
+      </div>
+      <p class="hint">Settings are not secret. Do not put passwords or keys in them.</p>
+    </section>
+
+    <section class="card">
+      <h2>Write a line to your logs</h2>
+      <p>Your application writes what it does to its logs. That is where you look first when something does not work as expected.</p>
+      <form id="log-form" class="log-form">
+        <label for="log-message">Message</label>
+        <div class="row">
+          <input id="log-message" name="message" maxlength="200" autocomplete="off" placeholder="Hello from the demo">
+          <button class="button" type="submit">Write to log</button>
+        </div>
+      </form>
+      <div id="log-result" hidden>
+        <p>Your application wrote a line to its logs with your message:</p>
+        <pre id="log-line"></pre>
+        <p>Open this application in My Apps and look at its logs. Look for <code>Message from the demo page</code>.</p>
+      </div>
+      <p id="log-error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section class="card">
+      <h2>Updates and versions</h2>
+      <p>You are running version <strong id="version-inline">–</strong>.</p>
+      <ul id="notes" class="notes"></ul>
+      <p>Each version of an image has its own tag. To update, you change the tag. The platform starts the new version first and only then stops the old one, so your application stays available.</p>
+      <div class="try">
+        <strong>Try it</strong>
+        <ol>
+          <li>Open this application in My Apps.</li>
+          <li>Change the tag to <code id="next-version">1.1.0</code> and save.</li>
+          <li>Keep this page open. It changes by itself when the new version is live.</li>
+        </ol>
+        <p id="rollback-hint" class="hint" hidden>Going back to an earlier version works the same way: change the tag back.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Deploy your own application</h2>
+      <p>This demo is an image like any other. Your own image works the same way when it does three things:</p>
+      <ul>
+        <li><strong>Listens on one port.</strong> You fill in that port in My Apps. This demo uses 8080.</li>
+        <li><strong>Runs as a regular user, not as root.</strong> Set a user number in your Dockerfile, for example <code>USER 1000</code>. A user name alone is not enough.</li>
+        <li><strong>Reads its settings from environment variables.</strong> Like <code>PAGE_COLOR</code> on this page.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Image <code>ghcr.io/glbnxt/myapps-demo</code>. Built for GLBNXT My Apps.</p>
+  </footer>
+</body>
+</html>
