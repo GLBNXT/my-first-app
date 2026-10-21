@@ -259,6 +259,9 @@ func securityHeaders(next http.Handler) http.Handler {
 		h.Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 		h.Set("X-Content-Type-Options", "nosniff")
 		h.Set("Referrer-Policy", "no-referrer")
+		// Check back on every load, so a browser never shows the previous
+		// version's page after an update.
+		h.Set("Cache-Control", "no-cache")
 		next.ServeHTTP(w, r)
 	})
 }
