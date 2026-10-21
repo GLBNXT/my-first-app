@@ -1,4 +1,4 @@
-# My Apps demo
+# My first app
 
 A small web page that customers deploy through GLBNXT **My Apps** to see how it
 works. It celebrates with confetti, shows the settings they entered, writes a
@@ -9,7 +9,8 @@ visible.
 
 | Field | Value |
 | --- | --- |
-| Image repository | `ghcr.io/glbnxt/myapps-demo` |
+| Application name | `hello` (address: `hello.<organisation>.glbnxt.com`) |
+| Image repository | `ghcr.io/glbnxt/my-first-app` |
 | Tag | `1.0.0` (then update to `1.1.0`) |
 | Container port | `8080` |
 
@@ -47,17 +48,17 @@ git tag v1.0.0 && git tag v1.1.0 && git push origin v1.0.0 v1.1.0
 ```
 
 The [publish workflow](.github/workflows/publish.yml) builds for amd64 and
-arm64 and pushes `ghcr.io/glbnxt/myapps-demo:<version>`. Make the package
+arm64 and pushes `ghcr.io/glbnxt/my-first-app:<version>`. Make the package
 public once, in the package settings on GitHub.
 
 ## Run locally
 
 ```bash
-docker build --build-arg VERSION=1.0.0 -t myapps-demo:1.0.0 .
-docker run --rm -p 8080:8080 -e PAGE_COLOR=purple myapps-demo:1.0.0
+docker build --build-arg VERSION=1.0.0 -t my-first-app:1.0.0 .
+docker run --rm -p 8080:8080 -e PAGE_COLOR=purple my-first-app:1.0.0
 ```
 
-Open <http://demo.acme.localtest.me:8080> to see the application and
+Open <http://hello.acme.localtest.me:8080> to see the application and
 organisation names filled in (they are read from the address).
 
 Confetti: [canvas-confetti](https://github.com/catdad/canvas-confetti) 1.9.4,

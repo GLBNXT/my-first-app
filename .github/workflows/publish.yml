@@ -1,4 +1,4 @@
-# Publishes ghcr.io/glbnxt/myapps-demo:<version> for every tag v<version>.
+# Publishes ghcr.io/glbnxt/my-first-app:<version> for every tag v<version>.
 # Push tag v1.0.0 and v1.1.0 to publish the two versions the page teaches with.
 name: Publish image
 
@@ -35,8 +35,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: VERSION=${{ steps.version.outputs.version }}
-          tags: ghcr.io/glbnxt/myapps-demo:${{ steps.version.outputs.version }}
+          tags: ghcr.io/glbnxt/my-first-app:${{ steps.version.outputs.version }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.description=My Apps demo: a small page that shows customers how My Apps works
+            org.opencontainers.image.description=My first app: a small page that shows customers how My Apps works
             org.opencontainers.image.version=${{ steps.version.outputs.version }}

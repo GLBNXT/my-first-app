@@ -23,7 +23,7 @@ function showPage() {
     if (item.dataset.page === page) item.setAttribute('aria-current', 'page');
     else item.removeAttribute('aria-current');
   });
-  document.title = `${$(`page-${page}`).dataset.title} · My Apps demo`;
+  document.title = `${$(`page-${page}`).dataset.title} · My first app`;
 }
 
 function celebrate(style, accent) {

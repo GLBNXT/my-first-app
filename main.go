@@ -1,4 +1,4 @@
-// My Apps demo: a small web page that customers deploy through My Apps to see
+// My first app: a small web page that customers deploy through My Apps to see
 // how it works. It shows their settings, writes a log line on request and
 // changes colour between versions, so an update is visible.
 //
@@ -305,7 +305,7 @@ func main() {
 	defer stop()
 
 	go func() {
-		logger.Info("My Apps demo started", "port", port, "color", cfg.Color, "confetti", cfg.Confetti)
+		logger.Info("My first app started", "port", port, "color", cfg.Color, "confetti", cfg.Confetti)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Error("Server stopped", "error", err)
 			os.Exit(1)
