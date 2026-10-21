@@ -62,3 +62,9 @@ organisation names filled in (they are read from the address).
 
 Confetti: [canvas-confetti](https://github.com/catdad/canvas-confetti) 1.9.4,
 vendored in `web/` (ISC licence, `web/confetti.LICENSE`).
+
+Look and feel: the GLBNXT portal tokens and component sizes from `@glbnxt/ui`
+(shadcn/ui) in plain CSS. Fonts vendored in `web/fonts/`: Inter (OFL, from
+`@fontsource/inter` 5.3.0), Archivo SemiBold and Red Hat Mono (OFL, from the
+GLBNXT CDN). Icons: [Lucide](https://lucide.dev) (ISC), rendered into
+`web/icons.js`.

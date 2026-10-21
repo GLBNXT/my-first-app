@@ -7,6 +7,39 @@ const $ = (id) => document.getElementById(id);
 
 let current = null;
 
+function drawIcons(root = document) {
+  root.querySelectorAll('[data-icon]').forEach((el) => {
+    if (!el.firstChild) el.innerHTML = window.ICONS[el.dataset.icon] || '';
+  });
+}
+
+// Pages: the hash picks one, like the portal's side menu.
+const PAGES = ['welcome', 'settings', 'logs', 'updates', 'deploy'];
+
+function showPage() {
+  const page = PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'welcome';
+  PAGES.forEach((name) => { $(`page-${name}`).hidden = name !== page; });
+  document.querySelectorAll('.menu-item').forEach((item) => {
+    if (item.dataset.page === page) item.setAttribute('aria-current', 'page');
+    else item.removeAttribute('aria-current');
+  });
+  document.title = `${$(`page-${page}`).dataset.title} · My Apps demo`;
+  closeMenu();
+  window.scrollTo(0, 0);
+}
+
+function openMenu() {
+  $('sidebar').classList.add('open');
+  $('scrim').hidden = false;
+  $('menu-button').setAttribute('aria-expanded', 'true');
+}
+
+function closeMenu() {
+  $('sidebar').classList.remove('open');
+  $('scrim').hidden = true;
+  $('menu-button').setAttribute('aria-expanded', 'false');
+}
+
 function celebrate(style, accent) {
   const base = { disableForReducedMotion: true, origin: { y: 0.6 } };
   switch (style) {
@@ -40,9 +73,18 @@ function celebrate(style, accent) {
   }
 }
 
+// Dark text on a light colour, light text on a dark one.
+function readableOn(hex) {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4 ? 'hsl(222.2 84% 4.9%)' : 'hsl(210 40% 98%)';
+}
+
 function render(info) {
   const s = info.settings;
-  document.documentElement.style.setProperty('--accent', s.color);
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty('--primary', s.color);
+  rootStyle.setProperty('--primary-foreground', readableOn(s.color));
   $('greeting').textContent = s.greeting;
 
   $('application').textContent = info.application || 'We could not read this from the address.';
@@ -51,18 +93,22 @@ function render(info) {
   $('address').href = info.address;
   $('version').textContent = info.version;
   $('version-inline').textContent = info.version;
+  $('sidebar-version').textContent = info.version;
   $('started').textContent = new Date(info.startedAt).toLocaleString();
 
   const rows = s.list.map((item) => {
     const tr = document.createElement('tr');
     const name = document.createElement('td');
-    name.innerHTML = '<code></code>';
-    name.firstChild.textContent = item.name;
+    const code = document.createElement('code');
+    code.textContent = item.name;
+    name.append(code);
 
     const now = document.createElement('td');
     if (!item.isSet) {
-      now.innerHTML = '<span class="default">Not set, so: </span>';
-      now.append(item.used);
+      const label = document.createElement('span');
+      label.className = 'muted';
+      label.textContent = 'Not set, so: ';
+      now.append(label, item.used);
     } else if (!item.accepted) {
       now.textContent = item.used;
       const warn = document.createElement('div');
@@ -76,7 +122,7 @@ function render(info) {
     const effect = document.createElement('td');
     effect.textContent = item.effect;
     const options = document.createElement('div');
-    options.className = 'hint';
+    options.className = 'muted small';
     options.textContent = `Options: ${item.options}`;
     effect.append(options);
 
@@ -93,6 +139,17 @@ function render(info) {
   const next = info.versions.find((v) => v !== info.version) || info.versions[0];
   $('next-version').textContent = next;
   $('rollback-hint').hidden = info.version !== info.versions[info.versions.length - 1];
+}
+
+function toast(title, text) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = '<span data-icon="check"></span><div><div class="toast-title"></div><div class="toast-text"></div></div>';
+  el.querySelector('.toast-title').textContent = title;
+  el.querySelector('.toast-text').textContent = text;
+  drawIcons(el);
+  $('toaster').append(el);
+  setTimeout(() => el.remove(), 8000);
 }
 
 function changesBetween(before, after) {
@@ -117,9 +174,7 @@ async function poll() {
     if (changes.length > 0) {
       current = info;
       render(info);
-      const banner = $('banner');
-      banner.textContent = `Your update is live: ${changes.join(' and ')}.`;
-      banner.hidden = false;
+      toast('Your update is live', `This page now runs ${changes.join(' and ')}.`);
       celebrate(info.settings.confetti, info.settings.color);
     }
   } catch {
@@ -130,6 +185,10 @@ async function poll() {
 $('celebrate').addEventListener('click', () => {
   if (current) celebrate(current.settings.confetti, current.settings.color);
 });
+
+$('menu-button').addEventListener('click', openMenu);
+$('scrim').addEventListener('click', closeMenu);
+window.addEventListener('hashchange', showPage);
 
 $('log-form').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -151,6 +210,9 @@ $('log-form').addEventListener('submit', async (event) => {
     $('log-error').hidden = false;
   }
 });
+
+drawIcons();
+showPage();
 
 (async () => {
   try {

@@ -3,104 +3,248 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Your first application</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎉%3C/text%3E%3C/svg%3E">
+  <title>My Apps demo</title>
+  <link rel="icon" href="glbnxt.png">
   <link rel="stylesheet" href="style.css">
+  <script src="icons.js" defer></script>
   <script src="confetti.browser.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
   <canvas id="confetti"></canvas>
 
-  <div id="banner" class="banner" role="status" hidden></div>
-
-  <header class="hero">
-    <p class="eyebrow">My Apps demo</p>
-    <h1>Congratulations, your first application is live!</h1>
-    <p id="greeting" class="greeting"></p>
-    <button id="celebrate" class="button" type="button">Celebrate again</button>
-  </header>
-
-  <main>
-    <section class="card">
-      <h2>Your application</h2>
-      <dl class="facts">
-        <dt>Name</dt><dd id="application">–</dd>
-        <dt>Organisation</dt><dd id="organisation">–</dd>
-        <dt>Address</dt><dd><a id="address" href="#">–</a></dd>
-        <dt>Version</dt><dd id="version">–</dd>
-        <dt>Running since</dt><dd id="started">–</dd>
-      </dl>
-      <p class="hint">The padlock next to the address in your browser means the connection is secure. The platform takes care of that for you.</p>
-    </section>
-
-    <section class="card">
-      <h2>Your settings</h2>
-      <p>This application reads three settings. You can change them in My Apps, under your application's environment variables.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Setting</th><th>Now</th><th>What it does</th></tr></thead>
-          <tbody id="settings"></tbody>
-        </table>
-      </div>
-      <div class="try">
-        <strong>Try it</strong>
-        <ol>
-          <li>Open this application in My Apps.</li>
-          <li>Add <code>PAGE_COLOR</code> with the value <code>purple</code>, or <code>CONFETTI_STYLE</code> with <code>stars</code>.</li>
-          <li>Save, and keep this page open. It changes by itself when your new settings are live.</li>
-        </ol>
-      </div>
-      <p class="hint">Settings are not secret. Do not put passwords or keys in them.</p>
-    </section>
-
-    <section class="card">
-      <h2>Write a line to your logs</h2>
-      <p>Your application writes what it does to its logs. That is where you look first when something does not work as expected.</p>
-      <form id="log-form" class="log-form">
-        <label for="log-message">Message</label>
-        <div class="row">
-          <input id="log-message" name="message" maxlength="200" autocomplete="off" placeholder="Hello from the demo">
-          <button class="button" type="submit">Write to log</button>
+  <div class="layout">
+    <aside id="sidebar" class="sidebar" aria-label="Main">
+      <div class="sidebar-header">
+        <img src="glbnxt.png" alt="" class="logo">
+        <div class="brand">
+          <span class="brand-name">GLBNXT</span>
+          <span class="brand-sub">My Apps demo</span>
         </div>
-      </form>
-      <div id="log-result" hidden>
-        <p>Your application wrote a line to its logs with your message:</p>
-        <pre id="log-line"></pre>
-        <p>Open this application in My Apps and look at its logs. Look for <code>Message from the demo page</code>.</p>
       </div>
-      <p id="log-error" class="error" role="alert" hidden></p>
-    </section>
+      <div class="separator"></div>
 
-    <section class="card">
-      <h2>Updates and versions</h2>
-      <p>You are running version <strong id="version-inline">–</strong>.</p>
-      <ul id="notes" class="notes"></ul>
-      <p>Each version of an image has its own tag. To update, you change the tag. The platform starts the new version first and only then stops the old one, so your application stays available.</p>
-      <div class="try">
-        <strong>Try it</strong>
-        <ol>
-          <li>Open this application in My Apps.</li>
-          <li>Change the tag to <code id="next-version">1.1.0</code> and save.</li>
-          <li>Keep this page open. It changes by itself when the new version is live.</li>
-        </ol>
-        <p id="rollback-hint" class="hint" hidden>Going back to an earlier version works the same way: change the tag back.</p>
+      <nav class="sidebar-content">
+        <div class="group-label">Your application</div>
+        <a class="menu-item" href="#welcome" data-page="welcome"><span data-icon="welcome"></span>Welcome</a>
+        <a class="menu-item" href="#settings" data-page="settings"><span data-icon="settings"></span>Settings</a>
+        <a class="menu-item" href="#logs" data-page="logs"><span data-icon="logs"></span>Logs</a>
+        <a class="menu-item" href="#updates" data-page="updates"><span data-icon="updates"></span>Updates</a>
+
+        <div class="group-label">Next steps</div>
+        <a class="menu-item" href="#deploy" data-page="deploy"><span data-icon="deploy"></span>Deploy your own</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Running version <strong id="sidebar-version">–</strong></span>
       </div>
-    </section>
+    </aside>
+    <div id="scrim" class="scrim" hidden></div>
 
-    <section class="card">
-      <h2>Deploy your own application</h2>
-      <p>This demo is an image like any other. Your own image works the same way when it does three things:</p>
-      <ul>
-        <li><strong>Listens on one port.</strong> You fill in that port in My Apps. This demo uses 8080.</li>
-        <li><strong>Runs as a regular user, not as root.</strong> Set a user number in your Dockerfile, for example <code>USER 1000</code>. A user name alone is not enough.</li>
-        <li><strong>Reads its settings from environment variables.</strong> Like <code>PAGE_COLOR</code> on this page.</li>
-      </ul>
-    </section>
-  </main>
+    <div class="main-column">
+      <div class="mobile-bar">
+        <button id="menu-button" class="button ghost icon-only" type="button" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false"><span data-icon="menu"></span></button>
+        <span class="brand-name">My Apps demo</span>
+      </div>
 
-  <footer class="footer">
-    <p>Image <code>ghcr.io/glbnxt/myapps-demo</code>. Built for GLBNXT My Apps.</p>
-  </footer>
+      <main class="main">
+        <!-- Welcome -->
+        <section class="page" id="page-welcome" data-title="Welcome">
+          <header class="page-header">
+            <div class="page-title"><span data-icon="welcome" class="page-icon"></span><h1>Congratulations, your first application is live!</h1></div>
+            <p id="greeting" class="muted"></p>
+          </header>
+
+          <div class="card hero">
+            <div class="card-content hero-content">
+              <div>
+                <h2 class="card-title">You deployed this page yourself</h2>
+                <p class="muted">The platform pulled your image, started it and gave it a secure address. Use the menu to learn what else you can do with it.</p>
+              </div>
+              <button id="celebrate" class="button" type="button"><span data-icon="sparkles"></span>Celebrate again</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Your application</h2>
+              <p class="card-description">What the platform tells this application about itself.</p>
+            </div>
+            <div class="card-content">
+              <dl class="facts">
+                <dt>Name</dt><dd id="application">–</dd>
+                <dt>Organisation</dt><dd id="organisation">–</dd>
+                <dt>Address</dt><dd><a id="address" href="#">–</a></dd>
+                <dt>Version</dt><dd><span id="version" class="badge">–</span></dd>
+                <dt>Running since</dt><dd id="started">–</dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="tiles">
+            <a class="card tile" href="#settings">
+              <span data-icon="settings" class="tile-icon"></span>
+              <span class="tile-title">Change a setting</span>
+              <span class="muted small">Pick a colour and a confetti style.</span>
+            </a>
+            <a class="card tile" href="#logs">
+              <span data-icon="logs" class="tile-icon"></span>
+              <span class="tile-title">Write to your logs</span>
+              <span class="muted small">See where your application reports what it does.</span>
+            </a>
+            <a class="card tile" href="#updates">
+              <span data-icon="updates" class="tile-icon"></span>
+              <span class="tile-title">Update to a new version</span>
+              <span class="muted small">Change the tag and watch this page change.</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section class="page" id="page-settings" data-title="Settings" hidden>
+          <header class="page-header">
+            <div class="page-title"><span data-icon="settings" class="page-icon"></span><h1>Settings</h1></div>
+            <p class="muted">This application reads three settings. You change them in My Apps, under your application's environment variables.</p>
+          </header>
+
+          <div class="card">
+            <div class="card-content flush">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Setting</th><th>Now</th><th>What it does</th></tr></thead>
+                  <tbody id="settings"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Try it</h2>
+            </div>
+            <div class="card-content">
+              <ol class="steps">
+                <li>Open this application in My Apps.</li>
+                <li>Add <code>PAGE_COLOR</code> with the value <code>purple</code>, or <code>CONFETTI_STYLE</code> with <code>stars</code>.</li>
+                <li>Save, and keep this page open. It changes by itself when your new settings are live.</li>
+              </ol>
+            </div>
+          </div>
+
+          <p class="muted small">Settings are not secret. Do not put passwords or keys in them.</p>
+        </section>
+
+        <!-- Logs -->
+        <section class="page" id="page-logs" data-title="Logs" hidden>
+          <header class="page-header">
+            <div class="page-title"><span data-icon="logs" class="page-icon"></span><h1>Logs</h1></div>
+            <p class="muted">Your application writes what it does to its logs. That is where you look first when something does not work as expected.</p>
+          </header>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Write a line to your logs</h2>
+              <p class="card-description">Type a message. Your application writes it to its logs.</p>
+            </div>
+            <div class="card-content">
+              <form id="log-form" class="log-form">
+                <label for="log-message" class="label">Message</label>
+                <div class="row">
+                  <input id="log-message" class="input" name="message" maxlength="200" autocomplete="off" placeholder="Hello from the demo">
+                  <button class="button" type="submit">Write to log</button>
+                </div>
+              </form>
+              <p id="log-error" class="error small" role="alert" hidden></p>
+            </div>
+          </div>
+
+          <div id="log-result" class="card" hidden>
+            <div class="card-header">
+              <h2 class="card-title"><span data-icon="check" class="inline-icon"></span>Written</h2>
+              <p class="card-description">Your application wrote a line to its logs with your message:</p>
+            </div>
+            <div class="card-content">
+              <pre id="log-line"></pre>
+              <p class="muted">Open this application in My Apps and look at its logs. Look for <code>Message from the demo page</code>.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Updates -->
+        <section class="page" id="page-updates" data-title="Updates" hidden>
+          <header class="page-header">
+            <div class="page-title"><span data-icon="updates" class="page-icon"></span><h1>Updates</h1></div>
+            <p class="muted">Each version of an image has its own tag. To update, you change the tag. The platform starts the new version first and only then stops the old one, so your application stays available.</p>
+          </header>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">You are running version <span id="version-inline" class="badge">–</span></h2>
+              <p class="card-description">What is in this version:</p>
+            </div>
+            <div class="card-content">
+              <ul id="notes" class="list"></ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Try it</h2>
+            </div>
+            <div class="card-content">
+              <ol class="steps">
+                <li>Open this application in My Apps.</li>
+                <li>Change the tag to <code id="next-version">1.1.0</code> and save.</li>
+                <li>Keep this page open. It changes by itself when the new version is live.</li>
+              </ol>
+              <p id="rollback-hint" class="muted small" hidden>Going back to an earlier version works the same way: change the tag back.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Deploy your own -->
+        <section class="page" id="page-deploy" data-title="Deploy your own" hidden>
+          <header class="page-header">
+            <div class="page-title"><span data-icon="deploy" class="page-icon"></span><h1>Deploy your own</h1></div>
+            <p class="muted">This demo is an image like any other. Your own image works the same way when it does three things.</p>
+          </header>
+
+          <div class="tiles">
+            <div class="card tile">
+              <span class="step-number">1</span>
+              <span class="tile-title">Listens on one port</span>
+              <span class="muted small">You fill in that port in My Apps. This demo uses <code>8080</code>.</span>
+            </div>
+            <div class="card tile">
+              <span class="step-number">2</span>
+              <span class="tile-title">Runs as a regular user</span>
+              <span class="muted small">Not as root. Set a user number in your Dockerfile, for example <code>USER 1000</code>. A user name alone is not enough.</span>
+            </div>
+            <div class="card tile">
+              <span class="step-number">3</span>
+              <span class="tile-title">Reads settings from variables</span>
+              <span class="muted small">Like <code>PAGE_COLOR</code> in this demo.</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">This demo</h2>
+            </div>
+            <div class="card-content">
+              <dl class="facts">
+                <dt>Image</dt><dd><code>ghcr.io/glbnxt/myapps-demo</code></dd>
+                <dt>Tags</dt><dd><code>1.0.0</code>, <code>1.1.0</code></dd>
+                <dt>Port</dt><dd><code>8080</code></dd>
+              </dl>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toaster" class="toaster" aria-live="polite"></div>
 </body>
 </html>
