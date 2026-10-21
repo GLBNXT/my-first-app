@@ -13,31 +13,17 @@ function drawIcons(root = document) {
   });
 }
 
-// Pages: the hash picks one, like the portal's side menu.
+// Pages: the hash picks one, like the section menu on the portal's pages.
 const PAGES = ['welcome', 'settings', 'logs', 'updates', 'deploy'];
 
 function showPage() {
   const page = PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'welcome';
   PAGES.forEach((name) => { $(`page-${name}`).hidden = name !== page; });
-  document.querySelectorAll('.menu-item').forEach((item) => {
+  document.querySelectorAll('.nav-item').forEach((item) => {
     if (item.dataset.page === page) item.setAttribute('aria-current', 'page');
     else item.removeAttribute('aria-current');
   });
   document.title = `${$(`page-${page}`).dataset.title} · My Apps demo`;
-  closeMenu();
-  window.scrollTo(0, 0);
-}
-
-function openMenu() {
-  $('sidebar').classList.add('open');
-  $('scrim').hidden = false;
-  $('menu-button').setAttribute('aria-expanded', 'true');
-}
-
-function closeMenu() {
-  $('sidebar').classList.remove('open');
-  $('scrim').hidden = true;
-  $('menu-button').setAttribute('aria-expanded', 'false');
 }
 
 function celebrate(style, accent) {
@@ -93,7 +79,7 @@ function render(info) {
   $('address').href = info.address;
   $('version').textContent = info.version;
   $('version-inline').textContent = info.version;
-  $('sidebar-version').textContent = info.version;
+  $('header-version').textContent = `Version ${info.version}`;
   $('started').textContent = new Date(info.startedAt).toLocaleString();
 
   const rows = s.list.map((item) => {
@@ -186,8 +172,6 @@ $('celebrate').addEventListener('click', () => {
   if (current) celebrate(current.settings.confetti, current.settings.color);
 });
 
-$('menu-button').addEventListener('click', openMenu);
-$('scrim').addEventListener('click', closeMenu);
 window.addEventListener('hashchange', showPage);
 
 $('log-form').addEventListener('submit', async (event) => {

@@ -13,47 +13,41 @@
 <body>
   <canvas id="confetti"></canvas>
 
-  <div class="layout">
-    <aside id="sidebar" class="sidebar" aria-label="Main">
-      <div class="sidebar-header">
-        <img src="glbnxt.png" alt="" class="logo">
-        <div class="brand">
-          <span class="brand-name">GLBNXT</span>
-          <span class="brand-sub">My Apps demo</span>
-        </div>
+  <div class="container">
+    <header class="top">
+      <div class="brand"><img src="glbnxt.png" alt="" class="logo"><span>My Apps demo</span></div>
+      <div class="title-row">
+        <h1>Congratulations, your application is live!</h1>
+        <span class="badge success"><span class="status-dot" aria-hidden="true"></span>Running</span>
+        <span id="header-version" class="badge secondary">–</span>
       </div>
-      <div class="separator"></div>
+      <p id="greeting" class="muted"></p>
+    </header>
 
-      <nav class="sidebar-content">
-        <div class="group-label">Your application</div>
-        <a class="menu-item" href="#welcome" data-page="welcome"><span data-icon="welcome"></span>Welcome</a>
-        <a class="menu-item" href="#settings" data-page="settings"><span data-icon="settings"></span>Settings</a>
-        <a class="menu-item" href="#logs" data-page="logs"><span data-icon="logs"></span>Logs</a>
-        <a class="menu-item" href="#updates" data-page="updates"><span data-icon="updates"></span>Updates</a>
-
-        <div class="group-label">Next steps</div>
-        <a class="menu-item" href="#deploy" data-page="deploy"><span data-icon="deploy"></span>Deploy your own</a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <span class="status-dot" aria-hidden="true"></span>
-        <span>Running version <strong id="sidebar-version">–</strong></span>
-      </div>
-    </aside>
-    <div id="scrim" class="scrim" hidden></div>
-
-    <div class="main-column">
-      <div class="mobile-bar">
-        <button id="menu-button" class="button ghost icon-only" type="button" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false"><span data-icon="menu"></span></button>
-        <span class="brand-name">My Apps demo</span>
-      </div>
+    <div class="columns">
+      <aside class="nav-column">
+        <nav class="section-nav" aria-label="Demo sections">
+          <div class="nav-group">
+            <a class="nav-item" href="#welcome" data-page="welcome"><span data-icon="welcome"></span>Welcome</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-title">Try it</div>
+            <a class="nav-item" href="#settings" data-page="settings"><span data-icon="settings"></span>Settings</a>
+            <a class="nav-item" href="#logs" data-page="logs"><span data-icon="logs"></span>Logs</a>
+            <a class="nav-item" href="#updates" data-page="updates"><span data-icon="updates"></span>Updates</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-title">Next steps</div>
+            <a class="nav-item" href="#deploy" data-page="deploy"><span data-icon="deploy"></span>Deploy your own</a>
+          </div>
+        </nav>
+      </aside>
 
       <main class="main">
         <!-- Welcome -->
         <section class="page" id="page-welcome" data-title="Welcome">
           <header class="page-header">
-            <div class="page-title"><span data-icon="welcome" class="page-icon"></span><h1>Congratulations, your first application is live!</h1></div>
-            <p id="greeting" class="muted"></p>
+            <h2>Welcome</h2>
           </header>
 
           <div class="card hero">
@@ -104,7 +98,7 @@
         <!-- Settings -->
         <section class="page" id="page-settings" data-title="Settings" hidden>
           <header class="page-header">
-            <div class="page-title"><span data-icon="settings" class="page-icon"></span><h1>Settings</h1></div>
+            <h2>Settings</h2>
             <p class="muted">This application reads three settings. You change them in My Apps, under your application's environment variables.</p>
           </header>
 
@@ -138,7 +132,7 @@
         <!-- Logs -->
         <section class="page" id="page-logs" data-title="Logs" hidden>
           <header class="page-header">
-            <div class="page-title"><span data-icon="logs" class="page-icon"></span><h1>Logs</h1></div>
+            <h2>Logs</h2>
             <p class="muted">Your application writes what it does to its logs. That is where you look first when something does not work as expected.</p>
           </header>
 
@@ -174,7 +168,7 @@
         <!-- Updates -->
         <section class="page" id="page-updates" data-title="Updates" hidden>
           <header class="page-header">
-            <div class="page-title"><span data-icon="updates" class="page-icon"></span><h1>Updates</h1></div>
+            <h2>Updates</h2>
             <p class="muted">Each version of an image has its own tag. To update, you change the tag. The platform starts the new version first and only then stops the old one, so your application stays available.</p>
           </header>
 
@@ -206,7 +200,7 @@
         <!-- Deploy your own -->
         <section class="page" id="page-deploy" data-title="Deploy your own" hidden>
           <header class="page-header">
-            <div class="page-title"><span data-icon="deploy" class="page-icon"></span><h1>Deploy your own</h1></div>
+            <h2>Deploy your own</h2>
             <p class="muted">This demo is an image like any other. Your own image works the same way when it does three things.</p>
           </header>
 
