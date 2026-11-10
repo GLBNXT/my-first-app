@@ -14,7 +14,7 @@ function drawIcons(root = document) {
 }
 
 // Pages: the hash picks one, like the section menu on the portal's pages.
-const PAGES = ['welcome', 'settings', 'logs', 'updates', 'deploy'];
+const PAGES = ['welcome', 'settings', 'logs', 'updates', 'services', 'deploy'];
 
 function showPage() {
   const page = PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'welcome';
@@ -125,7 +125,94 @@ function render(info) {
   const next = info.versions.find((v) => v !== info.version) || info.versions[0];
   $('next-version').textContent = next;
   $('rollback-hint').hidden = info.version !== info.versions[info.versions.length - 1];
+
+  renderService($('service-modelhub'), info.services.modelHub);
+  renderService($('service-database'), info.services.database);
 }
+
+// One platform service card: connected or not, which settings it reads.
+function renderService(card, service) {
+  const status = card.querySelector('.service-status');
+  status.className = `badge service-status ${service.connected ? 'success' : 'muted-badge'}`;
+  status.innerHTML = '<span class="status-dot" aria-hidden="true"></span>';
+  status.append(service.connected ? 'Connected' : 'Not connected');
+
+  card.querySelector('.service-address').textContent = service.address || 'None yet';
+  card.querySelector('.service-settings').replaceChildren(...service.settings.map((name) => {
+    const code = document.createElement('code');
+    code.textContent = name;
+    return code;
+  }));
+
+  const message = card.querySelector('.service-message');
+  message.textContent = service.message || '';
+  message.hidden = !service.message;
+  card.querySelector('.service-test').hidden = !service.connected;
+}
+
+function showResult(card, ok, text) {
+  const result = card.querySelector('.service-result');
+  const message = result.querySelector('.result-message');
+  message.className = `result-message ${ok ? 'ok' : 'fail'}`;
+  message.innerHTML = `<span data-icon="${ok ? 'check' : 'error'}"></span>`;
+  const span = document.createElement('span');
+  span.textContent = text;
+  message.append(span);
+  drawIcons(message);
+  result.hidden = false;
+}
+
+async function testService(button) {
+  const kind = button.dataset.test;
+  const card = button.closest('.card');
+  const label = button.textContent;
+  button.disabled = true;
+  button.innerHTML = '<span data-icon="loading" class="spin"></span>Testing…';
+  drawIcons(button);
+  try {
+    const response = await fetch(`/api/services/${kind}/test`, { method: 'POST' });
+    const body = await response.json();
+    showResult(card, body.ok, body.message);
+
+    if (kind === 'modelhub') {
+      const models = body.models || [];
+      const list = card.querySelector('.result-models');
+      list.replaceChildren(...models.map((id) => {
+        const li = document.createElement('li');
+        li.textContent = id;
+        return li;
+      }));
+      if (body.total > models.length) {
+        const li = document.createElement('li');
+        li.className = 'muted';
+        li.textContent = `and ${body.total - models.length} more`;
+        list.append(li);
+      }
+    } else {
+      const visits = body.visits || [];
+      const wrap = card.querySelector('.result-visits');
+      wrap.querySelector('tbody').replaceChildren(...visits.map((v) => {
+        const tr = document.createElement('tr');
+        [`#${v.id}`, new Date(v.visitedAt).toLocaleString(), v.version].forEach((text) => {
+          const td = document.createElement('td');
+          td.textContent = text;
+          tr.append(td);
+        });
+        return tr;
+      }));
+      wrap.hidden = visits.length === 0;
+    }
+  } catch {
+    showResult(card, false, 'We could not run the test just now. Try again.');
+  } finally {
+    button.disabled = false;
+    button.textContent = label;
+  }
+}
+
+document.querySelectorAll('.service-test').forEach((button) => {
+  button.addEventListener('click', () => testService(button));
+});
 
 function toast(title, text) {
   const el = document.createElement('div');
@@ -142,6 +229,7 @@ function changesBetween(before, after) {
   const changes = [];
   if (before.version !== after.version) changes.push(`version ${after.version}`);
   if (JSON.stringify(before.settings) !== JSON.stringify(after.settings)) changes.push('your new settings');
+  if (JSON.stringify(before.services) !== JSON.stringify(after.services)) changes.push('your platform services');
   return changes;
 }
 

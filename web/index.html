@@ -35,6 +35,7 @@
             <a class="nav-item" href="#settings" data-page="settings"><span data-icon="settings"></span>Settings</a>
             <a class="nav-item" href="#logs" data-page="logs"><span data-icon="logs"></span>Logs</a>
             <a class="nav-item" href="#updates" data-page="updates"><span data-icon="updates"></span>Updates</a>
+            <a class="nav-item" href="#services" data-page="services"><span data-icon="services"></span>Platform services</a>
           </div>
           <div class="nav-group">
             <div class="nav-title">What's next?</div>
@@ -91,6 +92,11 @@
               <span data-icon="updates" class="tile-icon"></span>
               <span class="tile-title">Update to a new version</span>
               <span class="muted small">Change the tag and watch this page change.</span>
+            </a>
+            <a class="card tile" href="#services">
+              <span data-icon="services" class="tile-icon"></span>
+              <span class="tile-title">Connect platform services</span>
+              <span class="muted small">Test the Model Hub and your own database.</span>
             </a>
           </div>
         </section>
@@ -197,6 +203,69 @@
           </div>
         </section>
 
+        <!-- Platform services -->
+        <section class="page" id="page-services" data-title="Platform services" hidden>
+          <header class="page-header">
+            <h2>Platform services</h2>
+            <p class="muted">The platform connects your application to its standard services. You switch a service on in My Apps; the platform then gives your application the settings it needs. Test each connection here.</p>
+          </header>
+
+          <div class="card" id="service-modelhub">
+            <div class="card-header service-header">
+              <div>
+                <h2 class="card-title"><span data-icon="modelhub" class="title-icon"></span>Model Hub</h2>
+                <p class="card-description">Language models through one standard API. This test asks which models your application may use.</p>
+              </div>
+              <span class="badge service-status">–</span>
+            </div>
+            <div class="card-content">
+              <dl class="facts">
+                <dt>Address</dt><dd class="service-address">–</dd>
+                <dt>Settings</dt><dd class="service-settings"></dd>
+              </dl>
+              <p class="service-message muted small" hidden></p>
+              <div class="row">
+                <button class="button service-test" type="button" data-test="modelhub">Test connection</button>
+              </div>
+              <div class="service-result" role="status" hidden>
+                <p class="result-message"></p>
+                <ul class="list result-models"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="service-database">
+            <div class="card-header service-header">
+              <div>
+                <h2 class="card-title"><span data-icon="database" class="title-icon"></span>Database</h2>
+                <p class="card-description">A Postgres database of your application's own. This test writes a visit to a table and reads the latest five back.</p>
+              </div>
+              <span class="badge service-status">–</span>
+            </div>
+            <div class="card-content">
+              <dl class="facts">
+                <dt>Database</dt><dd class="service-address">–</dd>
+                <dt>Settings</dt><dd class="service-settings"></dd>
+              </dl>
+              <p class="service-message muted small" hidden></p>
+              <div class="row">
+                <button class="button service-test" type="button" data-test="database">Test connection</button>
+              </div>
+              <div class="service-result" role="status" hidden>
+                <p class="result-message"></p>
+                <div class="table-wrap result-visits" hidden>
+                  <table>
+                    <thead><tr><th>Visit</th><th>When</th><th>Version</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="muted small">Keys and passwords stay inside your application. This page only shows the names of the settings.</p>
+        </section>
+
         <!-- Deploy your own -->
         <section class="page" id="page-deploy" data-title="Deploy your own" hidden>
           <header class="page-header">
@@ -229,7 +298,7 @@
             <div class="card-content">
               <dl class="facts">
                 <dt>Image</dt><dd><code>ghcr.io/glbnxt/my-first-app</code></dd>
-                <dt>Tags</dt><dd><code>1.0.0</code>, <code>1.1.0</code></dd>
+                <dt>Tags</dt><dd><code>1.0.0</code>, <code>1.1.0</code>, <code>1.2.0</code></dd>
                 <dt>Port</dt><dd><code>8080</code></dd>
               </dl>
             </div>

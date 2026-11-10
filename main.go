@@ -1,8 +1,10 @@
 // My first app: a small web page that customers deploy through My Apps to see
-// how it works. It shows their settings, writes a log line on request and
-// changes colour between versions, so an update is visible.
+// how it works. It shows their settings, writes a log line on request, tests
+// the platform services and changes colour between versions, so an update is
+// visible.
 //
-// Standard library only. Everything the page needs is embedded in the binary.
+// Standard library plus the Postgres driver pgx. Everything the page needs is
+// embedded in the binary.
 package main
 
 import (
@@ -44,7 +46,14 @@ var releases = map[string]release{
 		"The page is green by default.",
 		"This list of changes is new.",
 	}},
+	"1.2.0": {Color: "purple", Notes: []string{
+		"The page is purple by default.",
+		"New: Platform services. Test the connection to the Model Hub and to your own database.",
+	}},
 }
+
+// versions are the published versions, oldest first.
+var versions = []string{"1.0.0", "1.1.0", "1.2.0"}
 
 func currentRelease() release {
 	if r, ok := releases[version]; ok {
@@ -169,11 +178,12 @@ type info struct {
 	Organisation string    `json:"organisation"`
 	StartedAt    time.Time `json:"startedAt"`
 	Settings     settings  `json:"settings"`
+	Services     services  `json:"services"`
 }
 
 var startedAt = time.Now().UTC()
 
-func handleInfo(cfg settings) http.HandlerFunc {
+func handleInfo(cfg settings, svc services) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		host := r.Host
 		if h, _, err := net.SplitHostPort(host); err == nil {
@@ -191,12 +201,13 @@ func handleInfo(cfg settings) http.HandlerFunc {
 		writeJSON(w, http.StatusOK, info{
 			Version:      version,
 			Notes:        currentRelease().Notes,
-			Versions:     []string{"1.0.0", "1.1.0"},
+			Versions:     versions,
 			Address:      scheme + "://" + r.Host,
 			Application:  application,
 			Organisation: organisation,
 			StartedAt:    startedAt,
 			Settings:     cfg,
+			Services:     svc,
 		})
 	}
 }
@@ -289,8 +300,12 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("GET /", http.FileServerFS(web))
-	mux.HandleFunc("GET /api/info", handleInfo(cfg))
+	svc := readServices()
+	tests := &limiter{tokens: 10, last: time.Now()}
+	mux.HandleFunc("GET /api/info", handleInfo(cfg, svc))
 	mux.HandleFunc("POST /api/log", handleLog(logger))
+	mux.HandleFunc("POST /api/services/modelhub/test", handleTest(logger, tests, testModelHub))
+	mux.HandleFunc("POST /api/services/database/test", handleTest(logger, tests, testDatabase))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -305,7 +320,8 @@ func main() {
 	defer stop()
 
 	go func() {
-		logger.Info("My first app started", "port", port, "color", cfg.Color, "confetti", cfg.Confetti)
+		logger.Info("My first app started", "port", port, "color", cfg.Color, "confetti", cfg.Confetti,
+			"modelHub", svc.ModelHub.Connected, "database", svc.Database.Connected)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Error("Server stopped", "error", err)
 			os.Exit(1)
