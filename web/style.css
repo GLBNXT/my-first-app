@@ -292,3 +292,23 @@ tbody tr:hover { background: color-mix(in srgb, var(--muted) 50%, transparent); 
 }
 
 .status-dot { width: 0.375rem; height: 0.375rem; border-radius: 999px; background: currentColor; }
+
+/* Platform services */
+.title-icon { color: var(--primary); display: inline-flex; }
+.service-header { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.service-header .badge { flex-shrink: 0; gap: 0.375rem; }
+.badge.muted-badge { background: var(--muted); color: var(--muted-foreground); }
+.card-content .facts { margin-bottom: 1rem; }
+.service-settings { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.service-message { margin: 0 0 1rem; }
+.service-result { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.result-message { margin: 0 0 0.75rem; display: flex; align-items: flex-start; gap: 0.5rem; }
+.result-message [data-icon] { margin-top: 0.125rem; }
+.result-message.ok [data-icon] { color: var(--success); }
+.result-message.fail { color: var(--destructive); }
+.result-models { font-family: var(--font-mono); font-size: 0.8125rem; }
+.result-visits td, .result-visits th { padding-left: 0; }
+.button:disabled { opacity: 0.6; cursor: default; }
+.spin svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin svg { animation: none; } }
