@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net"
 	"net/http"
@@ -22,6 +23,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 const notConnected = "Not connected. Switch it on in My Apps, under Platform services."
@@ -38,6 +41,7 @@ type service struct {
 type services struct {
 	ModelHub service `json:"modelHub"`
 	Database service `json:"database"`
+	Storage  service `json:"storage"`
 }
 
 var modelHubSettings = []string{"GLBNXT_MODELHUB_BASE_URL", "GLBNXT_MODELHUB_API_KEY"}
@@ -45,6 +49,11 @@ var modelHubSettings = []string{"GLBNXT_MODELHUB_BASE_URL", "GLBNXT_MODELHUB_API
 var databaseSettings = []string{
 	"GLBNXT_DATABASE_HOST", "GLBNXT_DATABASE_PORT", "GLBNXT_DATABASE_NAME",
 	"GLBNXT_DATABASE_USER", "GLBNXT_DATABASE_PASSWORD",
+}
+
+var storageSettings = []string{
+	"GLBNXT_S3_ENDPOINT", "GLBNXT_S3_BUCKET", "GLBNXT_S3_ACCESS_KEY",
+	"GLBNXT_S3_SECRET_KEY", "GLBNXT_S3_REGION",
 }
 
 // lookup returns the values of names, and the names that are not set.
@@ -82,6 +91,17 @@ func readServices() services {
 	} else {
 		s.Database.Message = notConnected
 	}
+
+	st, missing := lookup(storageSettings)
+	s.Storage = service{Settings: storageSettings, Missing: missing, Connected: len(missing) == 0}
+	if s.Storage.Connected {
+		s.Storage.Address = st["GLBNXT_S3_BUCKET"]
+		if u, err := url.Parse(st["GLBNXT_S3_ENDPOINT"]); err == nil && u.Host != "" {
+			s.Storage.Address += " on " + u.Host
+		}
+	} else {
+		s.Storage.Message = notConnected
+	}
 	return s
 }
 
@@ -92,6 +112,13 @@ type testResult struct {
 	Models  []string `json:"models,omitempty"`
 	Total   int      `json:"total,omitempty"`
 	Visits  []visit  `json:"visits,omitempty"`
+	Files   []file   `json:"files,omitempty"`
+}
+
+type file struct {
+	Name     string    `json:"name"`
+	Size     int64     `json:"size"`
+	StoredAt time.Time `json:"storedAt"`
 }
 
 type visit struct {
@@ -301,4 +328,98 @@ func databaseFailure(err error) error {
 		return failure{"The database did not answer in time.", err}
 	}
 	return failure{"We could not reach the database.", err}
+}
+
+// storagePrefix keeps the test's files apart from anything else in the bucket.
+const storagePrefix = "my-first-app/"
+
+// storageClient builds an S3 client from the five settings. The endpoint is a
+// full address such as https://s3-api.example.com; any S3 library works the same way.
+func storageClient() (*minio.Client, string, bool, error) {
+	values, missing := lookup(storageSettings)
+	if len(missing) > 0 {
+		return nil, "", false, nil
+	}
+	u, err := url.Parse(values["GLBNXT_S3_ENDPOINT"])
+	if err != nil || u.Host == "" || (u.Scheme != "https" && u.Scheme != "http") {
+		return nil, "", true, failure{"The storage address in GLBNXT_S3_ENDPOINT is not a valid address.", err}
+	}
+	client, err := minio.New(u.Host, &minio.Options{
+		Creds:  credentials.NewStaticV4(values["GLBNXT_S3_ACCESS_KEY"], values["GLBNXT_S3_SECRET_KEY"], ""),
+		Secure: u.Scheme == "https",
+		Region: values["GLBNXT_S3_REGION"],
+	})
+	if err != nil {
+		return nil, "", true, failure{"The storage settings are not valid.", err}
+	}
+	return client, values["GLBNXT_S3_BUCKET"], true, nil
+}
+
+// testStorage stores one small file in the application's own bucket, lists
+// the files it stored before and reads the new one back: a write, a list and
+// a read, the three things an application needs.
+func testStorage(ctx context.Context) (testResult, error) {
+	client, bucket, ok, err := storageClient()
+	if !ok {
+		return testResult{Message: notConnected}, nil
+	}
+	if err != nil {
+		return testResult{}, err
+	}
+
+	now := time.Now().UTC()
+	name := storagePrefix + "visit-" + now.Format("20060102-150405.000000000") + ".txt"
+	content := "A visit at " + now.Format(time.RFC3339) + " from version " + version + ".\n"
+	if _, err := client.PutObject(ctx, bucket, name, strings.NewReader(content), int64(len(content)),
+		minio.PutObjectOptions{ContentType: "text/plain; charset=utf-8"}); err != nil {
+		return testResult{}, storageFailure(err)
+	}
+
+	obj, err := client.GetObject(ctx, bucket, name, minio.GetObjectOptions{})
+	if err != nil {
+		return testResult{}, storageFailure(err)
+	}
+	defer obj.Close()
+	buf := new(strings.Builder)
+	if _, err := io.Copy(buf, io.LimitReader(obj, 1<<16)); err != nil {
+		return testResult{}, storageFailure(err)
+	}
+	if buf.String() != content {
+		return testResult{}, failure{"The file we read back is not the file we stored.", nil}
+	}
+
+	var files []file
+	for o := range client.ListObjects(ctx, bucket, minio.ListObjectsOptions{Prefix: storagePrefix}) {
+		if o.Err != nil {
+			return testResult{}, storageFailure(o.Err)
+		}
+		files = append(files, file{Name: strings.TrimPrefix(o.Key, storagePrefix), Size: o.Size, StoredAt: o.LastModified})
+	}
+	total := len(files)
+	sort.Slice(files, func(i, j int) bool { return files[i].Name > files[j].Name })
+	if len(files) > 5 {
+		files = files[:5]
+	}
+
+	message := fmt.Sprintf("Connected. We stored a file in your bucket and read it back; it now holds %d files from this test.", total)
+	if total == 1 {
+		message = "Connected. We stored the first file in your bucket and read it back."
+	}
+	return testResult{OK: true, Message: message, Files: files, Total: total}, nil
+}
+
+// storageFailure turns a storage error into a sentence a customer can act on.
+func storageFailure(err error) error {
+	switch minio.ToErrorResponse(err).Code {
+	case "InvalidAccessKeyId", "SignatureDoesNotMatch":
+		return failure{"The storage did not accept this application's login. Switch Storage off and on again in My Apps.", err}
+	case "AccessDenied":
+		return failure{"This application's login may not do this in the bucket.", err}
+	case "NoSuchBucket":
+		return failure{"The bucket in GLBNXT_S3_BUCKET does not exist.", err}
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return failure{"The storage did not answer in time.", err}
+	}
+	return failure{"We could not reach the storage.", err}
 }

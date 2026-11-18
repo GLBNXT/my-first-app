@@ -38,6 +38,7 @@ works. A service whose settings are missing reads "Not connected".
 | --- | --- | --- |
 | Model Hub | `GLBNXT_MODELHUB_BASE_URL`, `GLBNXT_MODELHUB_API_KEY` (also `OPENAI_BASE_URL` and `OPENAI_API_KEY`, unless you set those yourself) | `GET <base URL>/models` with the key; shows the models the app may use |
 | Database | `GLBNXT_DATABASE_HOST`, `_PORT`, `_NAME`, `_USER`, `_PASSWORD` | Connects over TLS (`sslmode=require`), creates the table `visits` if needed, writes a visit and reads the latest five back |
+| Storage | `GLBNXT_S3_ENDPOINT`, `_BUCKET`, `_ACCESS_KEY`, `_SECRET_KEY`, `_REGION` | Stores a small file under `my-first-app/` in the bucket, reads it back and lists the latest five (with the minio-go S3 client) |
 
 Keys and passwords never reach the page: it only gets the setting names, the
 service address and the test result. When a test fails, the page shows a plain

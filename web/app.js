@@ -128,6 +128,7 @@ function render(info) {
 
   renderService($('service-modelhub'), info.services.modelHub);
   renderService($('service-database'), info.services.database);
+  renderService($('service-storage'), info.services.storage);
 }
 
 // One platform service card: connected or not, which settings it reads.
@@ -188,6 +189,19 @@ async function testService(button) {
         li.textContent = `and ${body.total - models.length} more`;
         list.append(li);
       }
+    } else if (kind === 'storage') {
+      const files = body.files || [];
+      const wrap = card.querySelector('.result-files');
+      wrap.querySelector('tbody').replaceChildren(...files.map((f) => {
+        const tr = document.createElement('tr');
+        [f.name, new Date(f.storedAt).toLocaleString(), `${f.size} bytes`].forEach((text) => {
+          const td = document.createElement('td');
+          td.textContent = text;
+          tr.append(td);
+        });
+        return tr;
+      }));
+      wrap.hidden = files.length === 0;
     } else {
       const visits = body.visits || [];
       const wrap = card.querySelector('.result-visits');
