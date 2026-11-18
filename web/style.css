@@ -266,7 +266,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--muted) 50%, transparent); 
 .inline-icon { color: var(--success); }
 
 /* Toast, bottom right, like the portal */
-.toaster { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 50; display: flex; flex-direction: column; gap: 0.5rem; }
+.toaster { position: fixed; right: 1.5rem; top: 1.5rem; z-index: 50; display: flex; flex-direction: column; gap: 0.5rem; }
 .toast {
   display: flex;
   align-items: flex-start;
@@ -283,7 +283,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--muted) 50%, transparent); 
 .toast [data-icon] { color: var(--success); margin-top: 0.125rem; }
 .toast-title { font-weight: 600; }
 .toast-text { color: var(--muted-foreground); font-size: 0.8125rem; }
-@keyframes toast-in { from { opacity: 0; transform: translateY(0.5rem); } }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-0.5rem); } }
 
 @media (max-width: 767px) {
   .title-row h1 { font-size: 1.5rem; line-height: 2rem; }
