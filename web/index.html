@@ -96,7 +96,7 @@
             <a class="card tile" href="#services">
               <span data-icon="services" class="tile-icon"></span>
               <span class="tile-title">Connect platform services</span>
-              <span class="muted small">Test the Model Hub and your own database.</span>
+              <span class="muted small">Test the Model Hub, your own database and your own storage.</span>
             </a>
           </div>
         </section>
@@ -256,6 +256,35 @@
                 <div class="table-wrap result-visits" hidden>
                   <table>
                     <thead><tr><th>Visit</th><th>When</th><th>Version</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="service-storage">
+            <div class="card-header service-header">
+              <div>
+                <h2 class="card-title"><span data-icon="storage" class="title-icon"></span>Storage</h2>
+                <p class="card-description">An S3 bucket of your application's own. This test stores a small file, reads it back and lists the latest five.</p>
+              </div>
+              <span class="badge service-status">–</span>
+            </div>
+            <div class="card-content">
+              <dl class="facts">
+                <dt>Bucket</dt><dd class="service-address">–</dd>
+                <dt>Settings</dt><dd class="service-settings"></dd>
+              </dl>
+              <p class="service-message muted small" hidden></p>
+              <div class="row">
+                <button class="button service-test" type="button" data-test="storage">Test connection</button>
+              </div>
+              <div class="service-result" role="status" hidden>
+                <p class="result-message"></p>
+                <div class="table-wrap result-files" hidden>
+                  <table>
+                    <thead><tr><th>File</th><th>Stored</th><th>Size</th></tr></thead>
                     <tbody></tbody>
                   </table>
                 </div>

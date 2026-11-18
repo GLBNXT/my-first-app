@@ -48,7 +48,7 @@ var releases = map[string]release{
 	}},
 	"1.2.0": {Color: "purple", Notes: []string{
 		"The page is purple by default.",
-		"New: Platform services. Test the connection to the Model Hub and to your own database.",
+		"New: Platform services. Test the connection to the Model Hub, to your own database and to your own storage.",
 	}},
 }
 
@@ -306,6 +306,7 @@ func main() {
 	mux.HandleFunc("POST /api/log", handleLog(logger))
 	mux.HandleFunc("POST /api/services/modelhub/test", handleTest(logger, tests, testModelHub))
 	mux.HandleFunc("POST /api/services/database/test", handleTest(logger, tests, testDatabase))
+	mux.HandleFunc("POST /api/services/storage/test", handleTest(logger, tests, testStorage))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	})
