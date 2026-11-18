@@ -50,10 +50,13 @@ var releases = map[string]release{
 		"The page is purple by default.",
 		"New: Platform services. Test the connection to the Model Hub, to your own database and to your own storage.",
 	}},
+	"1.2.1": {Color: "purple", Notes: []string{
+		"Notices now appear at the top right.",
+	}},
 }
 
 // versions are the published versions, oldest first.
-var versions = []string{"1.0.0", "1.1.0", "1.2.0"}
+var versions = []string{"1.0.0", "1.1.0", "1.2.0", "1.2.1"}
 
 func currentRelease() release {
 	if r, ok := releases[version]; ok {
